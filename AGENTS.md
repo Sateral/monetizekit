@@ -164,7 +164,7 @@ REDIS_TLS=true
 
 ## Suggested Next Tasks
 
-- Add org role enforcement helper (OWNER) and member management endpoints.
+- Build org member management UI (list/invite/remove/transfer owner).
 - Add API key verification utilities for request auth.
 - Add usage metering.
 - Add project-level settings (rename, delete) with safeguards.

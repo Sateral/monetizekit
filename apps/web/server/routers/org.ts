@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import { orgSlugSchema } from '@monetizekit/config';
 
-import { protectedProcedure, router } from '@/server/trpc';
+import { orgOwnerProcedure, orgProcedure, protectedProcedure, router } from '@/server/trpc';
 
 export const orgRouter = router({
   create: protectedProcedure
@@ -44,5 +44,227 @@ export const orgRouter = router({
         name: org.name,
         slug: org.slug,
       };
+    }),
+  listMembers: orgProcedure.query(async ({ ctx, input }) => {
+    const members = await ctx.prisma.orgMember.findMany({
+      where: {
+        orgId: input.orgId,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+      select: {
+        id: true,
+        role: true,
+        createdAt: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    return { members };
+  }),
+  addMember: orgOwnerProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.prisma.user.findUnique({
+        where: {
+          email: input.email,
+        },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'User not found.',
+        });
+      }
+
+      const existing = await ctx.prisma.orgMember.findUnique({
+        where: {
+          orgId_userId: {
+            orgId: input.orgId,
+            userId: user.id,
+          },
+        },
+      });
+
+      if (existing) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: 'User is already a member of this organization.',
+        });
+      }
+
+      const membership = await ctx.prisma.orgMember.create({
+        data: {
+          orgId: input.orgId,
+          userId: user.id,
+          role: 'MEMBER',
+        },
+        select: {
+          id: true,
+          role: true,
+          createdAt: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+        },
+      });
+
+      return { member: membership };
+    }),
+  removeMember: orgOwnerProcedure
+    .input(
+      z.object({
+        userId: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (input.userId === ctx.org.ownerUserId) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'You cannot remove the organization owner.',
+        });
+      }
+
+      const membership = await ctx.prisma.orgMember.findUnique({
+        where: {
+          orgId_userId: {
+            orgId: input.orgId,
+            userId: input.userId,
+          },
+        },
+      });
+
+      if (!membership) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Member not found.',
+        });
+      }
+
+      await ctx.prisma.orgMember.delete({
+        where: {
+          id: membership.id,
+        },
+      });
+
+      return { removed: true };
+    }),
+  updateMemberRole: orgOwnerProcedure
+    .input(
+      z.object({
+        userId: z.string().min(1),
+        role: z.enum(['OWNER', 'MEMBER']),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const membership = await ctx.prisma.orgMember.findUnique({
+        where: {
+          orgId_userId: {
+            orgId: input.orgId,
+            userId: input.userId,
+          },
+        },
+      });
+
+      if (!membership) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Member not found.',
+        });
+      }
+
+      if (input.role === 'MEMBER' && input.userId === ctx.org.ownerUserId) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'Transfer ownership before demoting the current owner.',
+        });
+      }
+
+      if (input.role === 'OWNER') {
+        const [, updatedMember] = await ctx.prisma.$transaction([
+          ctx.prisma.orgMember.updateMany({
+            where: {
+              orgId: input.orgId,
+              role: 'OWNER',
+            },
+            data: {
+              role: 'MEMBER',
+            },
+          }),
+          ctx.prisma.orgMember.update({
+            where: {
+              id: membership.id,
+            },
+            data: {
+              role: 'OWNER',
+            },
+            select: {
+              id: true,
+              role: true,
+              createdAt: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  image: true,
+                },
+              },
+            },
+          }),
+          ctx.prisma.organization.update({
+            where: {
+              id: input.orgId,
+            },
+            data: {
+              ownerUserId: input.userId,
+            },
+          }),
+        ]);
+
+        return { member: updatedMember };
+      }
+
+      const updatedMember = await ctx.prisma.orgMember.update({
+        where: {
+          id: membership.id,
+        },
+        data: {
+          role: input.role,
+        },
+        select: {
+          id: true,
+          role: true,
+          createdAt: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+        },
+      });
+
+      return { member: updatedMember };
     }),
 });
