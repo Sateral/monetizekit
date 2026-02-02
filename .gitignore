@@ -10,4 +10,4 @@ coverage
 bun.lock
 *.log
 
-/generated/prisma
+/packages/db/generated/prisma
