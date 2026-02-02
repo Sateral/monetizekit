@@ -164,7 +164,6 @@ REDIS_TLS=true
 
 ## Suggested Next Tasks
 
-- Add org switcher dropdown in dashboard header.
 - Add API key verification utilities for request auth.
 - Add usage metering.
 - Add project-level settings (rename, delete) with safeguards.

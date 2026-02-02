@@ -47,6 +47,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       orgSlug={membership.org.slug}
       orgRole={membership.role}
       userId={session.user.id}
+      orgs={memberships.map((item) => ({
+        orgId: item.org.id,
+        orgName: item.org.name,
+        orgSlug: item.org.slug,
+        role: item.role,
+      }))}
     />
   );
 }

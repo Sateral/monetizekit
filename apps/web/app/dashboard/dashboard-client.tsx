@@ -15,6 +15,7 @@ export function DashboardClient({
   orgSlug,
   orgRole,
   userId,
+  orgs,
 }: DashboardClientProps) {
   const projects = useProjects(orgId);
   const apiKeys = useApiKeys(orgId, projects.model.selectedProjectId);
@@ -28,8 +29,10 @@ export function DashboardClient({
         <div className="relative px-6 py-16">
           <div className="mx-auto max-w-6xl">
             <DashboardHeader
+              orgId={orgId}
               orgName={orgName}
               orgSlug={orgSlug}
+              orgs={orgs}
               selectedProjectName={projects.selectedProject?.name}
               selectedProjectSlug={projects.selectedProject?.slug}
             />
