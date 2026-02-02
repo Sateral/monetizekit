@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import { projectSlugSchema } from '@monetizekit/config';
 
-import { orgProcedure, router } from '@/server/trpc';
+import { orgOwnerProcedure, orgProcedure, router } from '@/server/trpc';
 
 const projectNameSchema = z.string().trim().min(2).max(80);
 
@@ -27,7 +27,7 @@ export const projectRouter = router({
 
     return { projects };
   }),
-  create: orgProcedure
+  create: orgOwnerProcedure
     .input(
       z.object({
         name: projectNameSchema,

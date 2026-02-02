@@ -86,6 +86,7 @@ REDIS_TLS=true
 - Router: `apps/web/server/routers/_app.ts`
 - Protected procedure: `protectedProcedure` in `apps/web/server/trpc.ts`
 - Org-scoped procedure: `orgProcedure` in `apps/web/server/trpc.ts`
+- Org-owner procedure: `orgOwnerProcedure` in `apps/web/server/trpc.ts`
 - Routers: `org`, `project`, `apiKey` in `apps/web/server/routers/*`
 - Client utilities: `apps/web/lib/trpc/*`
 

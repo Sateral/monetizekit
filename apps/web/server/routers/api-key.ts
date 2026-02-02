@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { cuidSchema } from '@monetizekit/config';
 
-import { orgProcedure, router } from '@/server/trpc';
+import { orgOwnerProcedure, orgProcedure, router } from '@/server/trpc';
 
 const apiKeyNameSchema = z.string().trim().min(2).max(80);
 const projectIdSchema = cuidSchema;
@@ -61,7 +61,7 @@ export const apiKeyRouter = router({
 
       return { apiKeys };
     }),
-  create: orgProcedure
+  create: orgOwnerProcedure
     .input(
       z.object({
         projectId: projectIdSchema,
@@ -110,7 +110,7 @@ export const apiKeyRouter = router({
         token: rawKey,
       };
     }),
-  revoke: orgProcedure
+  revoke: orgOwnerProcedure
     .input(
       z.object({
         apiKeyId: apiKeyIdSchema,

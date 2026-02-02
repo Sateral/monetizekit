@@ -11,6 +11,9 @@ export const router = t.router;
 export const procedure = t.procedure;
 export const createCallerFactory = t.createCallerFactory;
 
+/**
+ * A middleware that checks if the user is authenticated
+ */
 const isAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.session?.user?.id) {
     throw new TRPCError({ code: 'UNAUTHORIZED' });
@@ -30,6 +33,9 @@ const orgInputSchema = z.object({
   orgId: cuidSchema,
 });
 
+/**
+ * A procedure that requires the user to be a member of an organization
+ */
 export const orgProcedure = protectedProcedure
   .input(orgInputSchema)
   .use(async ({ ctx, input, next }) => {
@@ -61,3 +67,17 @@ export const orgProcedure = protectedProcedure
       },
     });
   });
+
+/**
+ * A procedure that requires the user to be an organization owner
+ */
+export const orgOwnerProcedure = orgProcedure.use(({ ctx, next }) => {
+  if (ctx.orgRole !== 'OWNER') {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'You must be an organization owner to perform this action.',
+    });
+  }
+
+  return next();
+});
