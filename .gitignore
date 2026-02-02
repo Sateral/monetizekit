@@ -7,5 +7,5 @@ out
 coverage
 .env
 .env.*
-bun.lockb
+bun.lock
 *.log
