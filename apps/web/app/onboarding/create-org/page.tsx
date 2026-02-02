@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { orgSlugSchema } from '@monetizekit/config';
 
+import { Button } from '@/components/ui/button';
 import { trpc } from '@/lib/trpc/client';
 
 type FormErrors = {
@@ -71,61 +72,68 @@ export default function CreateOrgPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 px-6 py-16 text-zinc-950">
-      <div className="mx-auto max-w-xl rounded-3xl border border-zinc-200 bg-white p-10 shadow-[0_30px_80px_-50px_rgba(0,0,0,0.45)]">
-        <h1 className="text-3xl font-semibold tracking-tight">Create your organization</h1>
-        <p className="mt-2 text-sm text-zinc-500">
-          This becomes the owner of your products, plans, and API keys.
-        </p>
-
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Organization name</label>
-            <input
-              value={name}
-              onChange={(event) => {
-                const nextName = event.target.value;
-                setName(nextName);
-                if (!slugEdited) {
-                  setSlug(slugify(nextName));
-                }
-              }}
-              className="w-full rounded-2xl border border-zinc-200 px-4 py-3 text-sm focus:border-zinc-900 focus:outline-none"
-              placeholder="MonetizeKit Labs"
-            />
-            {errors.name ? (
-              <p className="text-sm text-red-500">{errors.name}</p>
-            ) : null}
+      <div className="mx-auto max-w-xl">
+        <div className="rounded-[32px] border border-zinc-200 bg-white/90 p-10 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.5)] backdrop-blur">
+          <div className="text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.32em] text-zinc-400">
+              Organization setup
+            </p>
+            <h1 className="mt-4 text-3xl font-semibold tracking-tight">Create your organization</h1>
+            <p className="mt-2 text-sm text-zinc-500">
+              This becomes the owner of your products, plans, and API keys.
+            </p>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Organization slug</label>
-            <input
-              value={slug}
-              onChange={(event) => {
-                setSlugEdited(true);
-                setSlug(event.target.value);
-              }}
-              className="w-full rounded-2xl border border-zinc-200 px-4 py-3 text-sm focus:border-zinc-900 focus:outline-none"
-              placeholder="monetizekit"
-            />
-            <p className="text-xs text-zinc-500">Preview: {preview}</p>
-            {errors.slug ? (
-              <p className="text-sm text-red-500">{errors.slug}</p>
+          <div className="mt-8 h-px w-full bg-gradient-to-r from-transparent via-zinc-200 to-transparent" />
+
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-700">Organization name</label>
+              <input
+                value={name}
+                onChange={(event) => {
+                  const nextName = event.target.value;
+                  setName(nextName);
+                  if (!slugEdited) {
+                    setSlug(slugify(nextName));
+                  }
+                }}
+                className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-950 shadow-sm transition focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
+                placeholder="MonetizeKit Labs"
+              />
+              {errors.name ? <p className="text-sm text-red-500">{errors.name}</p> : null}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-700">Organization slug</label>
+              <input
+                value={slug}
+                onChange={(event) => {
+                  setSlugEdited(true);
+                  setSlug(event.target.value);
+                }}
+                className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-950 shadow-sm transition focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
+                placeholder="monetizekit"
+              />
+              <p className="text-xs text-zinc-500">Preview: {preview}</p>
+              {errors.slug ? <p className="text-sm text-red-500">{errors.slug}</p> : null}
+            </div>
+
+            {errors.form ? (
+              <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+                {errors.form}
+              </div>
             ) : null}
-          </div>
 
-          {errors.form ? (
-            <p className="text-sm text-red-500">{errors.form}</p>
-          ) : null}
-
-          <button
-            type="submit"
-            disabled={createOrg.isPending}
-            className="inline-flex w-full items-center justify-center rounded-full bg-zinc-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {createOrg.isPending ? 'Creating organization...' : 'Create organization'}
-          </button>
-        </form>
+            <Button
+              type="submit"
+              disabled={createOrg.isPending}
+              className="h-11 w-full rounded-2xl bg-zinc-950 text-sm font-semibold text-white shadow-lg shadow-zinc-950/20 transition hover:bg-zinc-800 hover:cursor-pointer"
+            >
+              {createOrg.isPending ? 'Creating organization...' : 'Create organization'}
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   );

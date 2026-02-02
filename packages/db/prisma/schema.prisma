@@ -26,6 +26,7 @@ model User {
   accounts      Account[]
   orgMemberships OrgMember[]
   ownedOrgs     Organization[] @relation("OrganizationOwner")
+  apiKeys       ApiKey[]
 
   @@unique([email])
   @@map("user")
@@ -86,6 +87,7 @@ model Organization {
   ownerUserId String
   owner       User        @relation("OrganizationOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
   members     OrgMember[]
+  projects    Project[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }
@@ -102,6 +104,36 @@ model OrgMember {
 
   @@unique([orgId, userId])
   @@index([userId])
+}
+
+model Project {
+  id        String     @id @default(cuid())
+  orgId     String
+  name      String
+  slug      String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  apiKeys   ApiKey[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([orgId, slug])
+  @@index([orgId])
+}
+
+model ApiKey {
+  id              String   @id @default(cuid())
+  projectId       String
+  createdByUserId String
+  name            String
+  keyHash         String   @unique
+  keyLast4        String
+  revokedAt       DateTime?
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy       User     @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+
+  @@index([projectId])
+  @@index([createdByUserId])
 }
 
 enum OrgRole {

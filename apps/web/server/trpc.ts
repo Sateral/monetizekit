@@ -1,4 +1,7 @@
 import { TRPCError, initTRPC } from '@trpc/server';
+import { z } from 'zod';
+
+import { cuidSchema } from '@monetizekit/config';
 
 import type { TRPCContext } from '@/server/context';
 
@@ -22,3 +25,39 @@ const isAuthed = t.middleware(({ ctx, next }) => {
 });
 
 export const protectedProcedure = t.procedure.use(isAuthed);
+
+const orgInputSchema = z.object({
+  orgId: cuidSchema,
+});
+
+export const orgProcedure = protectedProcedure
+  .input(orgInputSchema)
+  .use(async ({ ctx, input, next }) => {
+    const membership = await ctx.prisma.orgMember.findUnique({
+      where: {
+        orgId_userId: {
+          orgId: input.orgId,
+          userId: ctx.userId,
+        },
+      },
+      include: {
+        org: true,
+      },
+    });
+
+    if (!membership) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'You are not a member of this organization.',
+      });
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        org: membership.org,
+        membership,
+        orgRole: membership.role,
+      },
+    });
+  });
