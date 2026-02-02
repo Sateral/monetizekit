@@ -15,12 +15,18 @@
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
+  "dependencies": {
+    "@prisma/client": "^7.3.0"
+  },
   "devDependencies": {
+    "@types/node": "^25.2.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
+    "dotenv": "^17.2.3",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.3.3",
+    "prisma": "^7.3.0",
     "turbo": "^2.0.6",
     "typescript": "^5.5.4"
   }
