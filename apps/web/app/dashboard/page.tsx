@@ -5,8 +5,15 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/server/db';
 
 import { DashboardClient } from './dashboard-client';
+import { EmptyDashboard } from './empty-dashboard';
 
-export default async function DashboardPage() {
+type DashboardPageProps = {
+  searchParams: {
+    orgId?: string;
+  };
+};
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const requestHeaders = await headers();
   const session = await auth.api.getSession({ headers: requestHeaders });
 
@@ -14,13 +21,23 @@ export default async function DashboardPage() {
     redirect('/sign-in');
   }
 
-  const membership = await prisma.orgMember.findFirst({
+  const memberships = await prisma.orgMember.findMany({
     where: { userId: session.user.id },
     include: { org: true },
+    orderBy: { createdAt: 'asc' },
   });
 
+  if (memberships.length === 0) {
+    return <EmptyDashboard />;
+  }
+
+  const requestedOrgId = searchParams.orgId;
+  const membership = requestedOrgId
+    ? memberships.find((item) => item.orgId === requestedOrgId)
+    : memberships[0];
+
   if (!membership) {
-    redirect('/onboarding/create-org');
+    redirect('/orgs');
   }
 
   return (
