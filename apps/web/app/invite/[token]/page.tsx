@@ -9,13 +9,25 @@ import { prisma } from '@/server/db';
 import { AcceptInviteClient } from './accept-client';
 
 type InvitePageProps = {
-  params: {
-    token: string;
-  };
+  params: Promise<{
+    token?: string;
+  }>;
 };
 
 export default async function InvitePage({ params }: InvitePageProps) {
-  const token = params.token;
+  const { token } = await params;
+
+  if (!token) {
+    return (
+      <div className="min-h-screen bg-[#f7f4ef] px-6 py-20 text-[#1f1a17]">
+        <div className="mx-auto max-w-2xl rounded-[28px] border border-[#e2d6c4] bg-white/80 p-8 text-center shadow-[0_30px_80px_-55px_rgba(27,20,16,0.65)]">
+          <p className="text-xs uppercase tracking-[0.3em] text-[#8c7a6b]">Invite status</p>
+          <h1 className="mt-3 text-2xl font-semibold">Invite not found</h1>
+          <p className="mt-3 text-sm text-[#6b5d52]">This invite link is invalid or missing.</p>
+        </div>
+      </div>
+    );
+  }
   const tokenHash = createHash('sha256').update(token).digest('hex');
   const invite = await prisma.orgInvite.findUnique({
     where: { tokenHash },
