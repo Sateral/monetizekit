@@ -28,6 +28,8 @@ export default async function DashboardPage() {
       orgId={membership.org.id}
       orgName={membership.org.name}
       orgSlug={membership.org.slug}
+      orgRole={membership.role}
+      userId={session.user.id}
     />
   );
 }
