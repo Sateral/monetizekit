@@ -3,8 +3,8 @@ import 'server-only';
 import { createHydrationHelpers } from '@trpc/react-query/rsc';
 import { cache } from 'react';
 
-import { createCallerFactory } from '@/server/trpc';
 import { createTRPCContext } from '@/server/context';
+import { createCallerFactory } from '@/server/trpc';
 import { appRouter } from '@/server/routers/_app';
 import { makeQueryClient } from '@/lib/trpc/query-client';
 
