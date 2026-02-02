@@ -49,6 +49,12 @@ Run from repo root:
 - Migrate dev: `bunx prisma migrate dev --name <migration_name>`
 - Reset DB (destructive): `bunx prisma migrate reset --force`
 
+### Shadcn
+
+- Import common components such as Button, Badge, Input, etc. from shadcn whenever possible
+- Always use `bunx shadcn@latest add <component>`
+- Never import the code manually
+
 ### Tests
 
 No automated test runner is configured yet.
@@ -137,6 +143,7 @@ REDIS_TLS=true
 - Keep tRPC context minimal and serializable.
 - Prefer explicit returns from procedures (avoid `any`).
 - When adding new domains, add router + schema + UI together.
+- Update 'Suggested Next Tasks' in `AGENTS.md` after completetion of every task
 
 ## Documentation Rule (Context7)
 
