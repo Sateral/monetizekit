@@ -1,9 +1,17 @@
+import { createHash, randomBytes } from 'crypto';
+
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import { orgSlugSchema } from '@monetizekit/config';
 
+import { sendOrgInviteEmail } from '@/lib/email';
 import { orgOwnerProcedure, orgProcedure, protectedProcedure, router } from '@/server/trpc';
+
+const inviteExpiryMs = 7 * 24 * 60 * 60 * 1000;
+
+const createInviteToken = () => randomBytes(32).toString('base64url');
+const hashInviteToken = (value: string) => createHash('sha256').update(value).digest('hex');
 
 export const orgRouter = router({
   create: protectedProcedure
@@ -128,6 +136,219 @@ export const orgRouter = router({
       });
 
       return { member: membership };
+    }),
+  inviteCreate: orgOwnerProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const email = input.email.toLowerCase();
+      const existingUser = await ctx.prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (existingUser) {
+        const existingMember = await ctx.prisma.orgMember.findUnique({
+          where: {
+            orgId_userId: {
+              orgId: input.orgId,
+              userId: existingUser.id,
+            },
+          },
+        });
+
+        if (existingMember) {
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: 'User is already a member of this organization.',
+          });
+        }
+      }
+
+      await ctx.prisma.orgInvite.updateMany({
+        where: {
+          orgId: input.orgId,
+          email,
+          acceptedAt: null,
+          revokedAt: null,
+        },
+        data: {
+          revokedAt: new Date(),
+        },
+      });
+
+      const token = createInviteToken();
+      const invite = await ctx.prisma.orgInvite.create({
+        data: {
+          orgId: input.orgId,
+          email,
+          role: 'MEMBER',
+          tokenHash: hashInviteToken(token),
+          expiresAt: new Date(Date.now() + inviteExpiryMs),
+          invitedByUserId: ctx.userId,
+        },
+        include: {
+          org: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+
+      const baseUrl = process.env.BETTER_AUTH_URL ?? 'http://localhost:3000';
+      const inviteUrl = new URL(`/invite/${token}`, baseUrl).toString();
+
+      await sendOrgInviteEmail({
+        toEmail: invite.email,
+        orgName: invite.org.name,
+        inviteUrl,
+        inviterName: ctx.session?.user?.name,
+      });
+
+      return {
+        id: invite.id,
+        email: invite.email,
+        role: invite.role,
+        expiresAt: invite.expiresAt,
+        createdAt: invite.createdAt,
+        inviteUrl,
+      };
+    }),
+  inviteList: orgOwnerProcedure.query(async ({ ctx, input }) => {
+    const invites = await ctx.prisma.orgInvite.findMany({
+      where: {
+        orgId: input.orgId,
+        acceptedAt: null,
+        revokedAt: null,
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        expiresAt: true,
+        acceptedAt: true,
+        revokedAt: true,
+        createdAt: true,
+      },
+    });
+
+    return { invites };
+  }),
+  inviteRevoke: orgOwnerProcedure
+    .input(
+      z.object({
+        inviteId: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const invite = await ctx.prisma.orgInvite.findFirst({
+        where: {
+          id: input.inviteId,
+          orgId: input.orgId,
+          revokedAt: null,
+        },
+      });
+
+      if (!invite) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Invite not found.',
+        });
+      }
+
+      const revokedInvite = await ctx.prisma.orgInvite.update({
+        where: { id: invite.id },
+        data: { revokedAt: new Date() },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          expiresAt: true,
+          acceptedAt: true,
+          revokedAt: true,
+          createdAt: true,
+        },
+      });
+
+      return { invite: revokedInvite };
+    }),
+  inviteAccept: protectedProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const tokenHash = hashInviteToken(input.token);
+      const invite = await ctx.prisma.orgInvite.findUnique({
+        where: { tokenHash },
+      });
+
+      if (!invite) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Invite not found.',
+        });
+      }
+
+      if (invite.revokedAt || invite.acceptedAt) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'This invite is no longer active.',
+        });
+      }
+
+      if (invite.expiresAt.getTime() < Date.now()) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'This invite has expired.',
+        });
+      }
+
+      const sessionEmail = ctx.session?.user?.email?.toLowerCase();
+      if (!sessionEmail || sessionEmail !== invite.email.toLowerCase()) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'This invite does not match your signed-in email.',
+        });
+      }
+
+      await ctx.prisma.$transaction(async (tx) => {
+        const existingMember = await tx.orgMember.findUnique({
+          where: {
+            orgId_userId: {
+              orgId: invite.orgId,
+              userId: ctx.userId,
+            },
+          },
+        });
+
+        if (!existingMember) {
+          await tx.orgMember.create({
+            data: {
+              orgId: invite.orgId,
+              userId: ctx.userId,
+              role: invite.role,
+            },
+          });
+        }
+
+        await tx.orgInvite.update({
+          where: { id: invite.id },
+          data: { acceptedAt: new Date() },
+        });
+      });
+
+      return { orgId: invite.orgId };
     }),
   removeMember: orgOwnerProcedure
     .input(

@@ -5,18 +5,27 @@ import { useState } from 'react';
 
 import { trpc } from '@/lib/trpc/client';
 
-import type { Member, MemberActions, MemberFormErrors, MemberModel } from '@/types/dashboard';
+import type {
+  Member,
+  MemberActions,
+  MemberFormErrors,
+  MemberModel,
+  OrgInvite,
+} from '@/types/dashboard';
 
 export function useMembers(orgId: string, orgRole: 'OWNER' | 'MEMBER', userId: string) {
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState<MemberFormErrors>({});
+  const isOwner = orgRole === 'OWNER';
 
   const memberList = trpc.org.listMembers.useQuery({ orgId });
-  const addMember = trpc.org.addMember.useMutation({
+  const inviteList = trpc.org.inviteList.useQuery({ orgId }, { enabled: isOwner });
+  const createInvite = trpc.org.inviteCreate.useMutation({
     onSuccess: async () => {
       setEmail('');
       setErrors({});
       await memberList.refetch();
+      await inviteList.refetch();
     },
     onError: (error) => {
       setErrors({ form: error.message });
@@ -35,6 +44,12 @@ export function useMembers(orgId: string, orgRole: 'OWNER' | 'MEMBER', userId: s
     },
   });
 
+  const revokeInvite = trpc.org.inviteRevoke.useMutation({
+    onSuccess: async () => {
+      await inviteList.refetch();
+    },
+  });
+
   const validate = () => {
     const nextErrors: MemberFormErrors = {};
     if (!email.trim()) {
@@ -49,7 +64,7 @@ export function useMembers(orgId: string, orgRole: 'OWNER' | 'MEMBER', userId: s
     event.preventDefault();
     if (!validate()) return;
 
-    addMember.mutate({
+    createInvite.mutate({
       orgId,
       email: email.trim().toLowerCase(),
     });
@@ -92,14 +107,23 @@ export function useMembers(orgId: string, orgRole: 'OWNER' | 'MEMBER', userId: s
     });
   };
 
+  const handleRevokeInvite = (inviteId: string, inviteEmail: string) => {
+    const confirmed = window.confirm(`Revoke the invite sent to ${inviteEmail}?`);
+    if (!confirmed) return;
+
+    revokeInvite.mutate({ orgId, inviteId });
+  };
+
   const members: Member[] = memberList.data?.members ?? [];
-  const isOwner = orgRole === 'OWNER';
+  const invites: OrgInvite[] = inviteList.data?.invites ?? [];
 
   const model: MemberModel = {
     members,
+    invites,
     isLoading: memberList.isLoading,
+    isInvitesLoading: isOwner ? inviteList.isLoading : false,
     isOwner,
-    isSubmitting: addMember.isPending,
+    isInviting: createInvite.isPending,
     userId,
     email,
     errors,
@@ -111,6 +135,7 @@ export function useMembers(orgId: string, orgRole: 'OWNER' | 'MEMBER', userId: s
     onRemove: handleRemove,
     onTransferOwner: handleTransferOwner,
     onDemoteOwner: handleDemoteOwner,
+    onRevokeInvite: handleRevokeInvite,
   };
 
   return {

@@ -3,8 +3,19 @@ import { Button } from '@/components/ui/button';
 import type { MemberSectionProps } from '@/types/dashboard';
 
 export function MemberSection({ model, actions }: MemberSectionProps) {
-  const { members, isLoading, isOwner, isSubmitting, userId, email, errors } = model;
-  const { onEmailChange, onSubmit, onRemove, onTransferOwner, onDemoteOwner } = actions;
+  const {
+    members,
+    invites,
+    isLoading,
+    isInvitesLoading,
+    isOwner,
+    isInviting,
+    userId,
+    email,
+    errors,
+  } = model;
+  const { onEmailChange, onSubmit, onRemove, onTransferOwner, onDemoteOwner, onRevokeInvite } =
+    actions;
 
   return (
     <section className="mt-8 rounded-[34px] border border-[#e0d2bf] bg-white/90 p-10 shadow-[0_30px_70px_-60px_rgba(27,20,16,0.7)]">
@@ -45,10 +56,10 @@ export function MemberSection({ model, actions }: MemberSectionProps) {
             ) : null}
             <Button
               type="submit"
-              disabled={!isOwner || isSubmitting}
+              disabled={!isOwner || isInviting}
               className="h-10 rounded-2xl bg-[#1f1a17] text-sm font-semibold text-[#f7f4ef] shadow-lg shadow-[#1f1a17]/25 transition hover:bg-[#2a231f] disabled:bg-[#cbbdaf]"
             >
-              {isSubmitting ? 'Adding member...' : 'Add member'}
+              {isInviting ? 'Sending invite...' : 'Send invite'}
             </Button>
             {!isOwner ? (
               <p className="text-xs text-[#9c8877]">Only owners can invite or remove members.</p>
@@ -137,6 +148,57 @@ export function MemberSection({ model, actions }: MemberSectionProps) {
                           Remove
                         </Button>
                       ) : null}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-[26px] border border-[#eadfcf] bg-[#fffdf8] p-6">
+          <div className="flex items-center justify-between">
+            <p className="text-xs uppercase tracking-[0.3em] text-[#9c8877]">Pending invites</p>
+            <p className="text-[11px] uppercase tracking-[0.28em] text-[#b6a59a]">Expiry</p>
+          </div>
+
+          <div className="mt-4 grid gap-3">
+            {isInvitesLoading ? (
+              <p className="text-sm text-[#7a6b5f]">Loading invites...</p>
+            ) : invites.length === 0 ? (
+              <div className="rounded-2xl border border-[#eadfcf] bg-white px-4 py-4 text-sm text-[#6b5d52]">
+                No active invites.
+              </div>
+            ) : (
+              invites.map((invite) => {
+                const expiresAt = new Date(invite.expiresAt);
+                const expiresLabel = expiresAt.toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                });
+
+                return (
+                  <div
+                    key={invite.id}
+                    className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#e6d9c8] bg-white px-4 py-4"
+                  >
+                    <div>
+                      <p className="text-sm font-semibold text-[#1f1a17]">{invite.email}</p>
+                      <p className="text-xs text-[#9c8877]">Expires {expiresLabel}</p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full border border-[#e5dcd4] bg-[#f7f0e6] px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-[#7a6b5f]">
+                        Pending
+                      </span>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onRevokeInvite(invite.id, invite.email)}
+                        className="rounded-full border-[#f0d5c3] text-[10px] uppercase tracking-[0.24em] text-[#b05b3b]"
+                      >
+                        Revoke
+                      </Button>
                     </div>
                   </div>
                 );

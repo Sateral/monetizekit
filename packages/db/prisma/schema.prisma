@@ -27,6 +27,7 @@ model User {
   orgMemberships OrgMember[]
   ownedOrgs     Organization[] @relation("OrganizationOwner")
   apiKeys       ApiKey[]
+  sentOrgInvites OrgInvite[]
 
   @@unique([email])
   @@map("user")
@@ -88,6 +89,7 @@ model Organization {
   owner       User        @relation("OrganizationOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
   members     OrgMember[]
   projects    Project[]
+  invites     OrgInvite[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }
@@ -104,6 +106,26 @@ model OrgMember {
 
   @@unique([orgId, userId])
   @@index([userId])
+}
+
+model OrgInvite {
+  id             String       @id @default(cuid())
+  orgId          String
+  email          String
+  role           OrgRole      @default(MEMBER)
+  tokenHash      String       @unique
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  revokedAt      DateTime?
+  invitedByUserId String
+  org            Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  invitedBy      User         @relation(fields: [invitedByUserId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([orgId])
+  @@index([email])
+  @@index([expiresAt])
 }
 
 model Project {

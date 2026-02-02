@@ -11,6 +11,16 @@ export type Member = {
   };
 };
 
+export type OrgInvite = {
+  id: string;
+  email: string;
+  role: 'OWNER' | 'MEMBER';
+  expiresAt: string | Date;
+  acceptedAt: string | Date | null;
+  revokedAt: string | Date | null;
+  createdAt: string | Date;
+};
+
 export type MemberFormErrors = {
   email?: string;
   form?: string;
@@ -18,9 +28,11 @@ export type MemberFormErrors = {
 
 export type MemberModel = {
   members: Member[];
+  invites: OrgInvite[];
   isLoading: boolean;
+  isInvitesLoading: boolean;
   isOwner: boolean;
-  isSubmitting: boolean;
+  isInviting: boolean;
   userId: string;
   email: string;
   errors: MemberFormErrors;
@@ -32,6 +44,7 @@ export type MemberActions = {
   onRemove: (memberId: string, memberName: string | null) => void;
   onTransferOwner: (memberId: string, memberName: string | null) => void;
   onDemoteOwner: (memberId: string, memberName: string | null) => void;
+  onRevokeInvite: (inviteId: string, inviteEmail: string) => void;
 };
 
 export type MemberSectionProps = {

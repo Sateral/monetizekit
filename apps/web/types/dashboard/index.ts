@@ -12,6 +12,7 @@ export type {
   MemberActions,
   MemberFormErrors,
   MemberModel,
+  OrgInvite,
   MemberSectionProps,
 } from './members';
 export type {
