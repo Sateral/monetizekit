@@ -166,6 +166,7 @@ REDIS_TLS=true
 
 - Add API key verification utilities for request auth.
 - Add usage metering.
-- Add Usage and Billing dashboard tabs with placeholder states.
+- Add Usage and Billing sidebar sections with placeholder states.
+- Add deep-link routing for sidebar sections (URL state).
 - Add project-level settings (rename, delete) with safeguards.
 - Add org member invites UI polish (resend/copy link).

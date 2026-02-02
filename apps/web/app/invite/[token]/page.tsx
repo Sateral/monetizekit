@@ -19,11 +19,13 @@ export default async function InvitePage({ params }: InvitePageProps) {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-[#f7f4ef] px-6 py-20 text-[#1f1a17]">
-        <div className="mx-auto max-w-2xl rounded-[28px] border border-[#e2d6c4] bg-white/80 p-8 text-center shadow-[0_30px_80px_-55px_rgba(27,20,16,0.65)]">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#8c7a6b]">Invite status</p>
+      <div className="min-h-screen bg-slate-50 px-6 py-20 text-slate-900">
+        <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">
+            Invite status
+          </p>
           <h1 className="mt-3 text-2xl font-semibold">Invite not found</h1>
-          <p className="mt-3 text-sm text-[#6b5d52]">This invite link is invalid or missing.</p>
+          <p className="mt-3 text-sm text-slate-500">This invite link is invalid or missing.</p>
         </div>
       </div>
     );
@@ -47,11 +49,13 @@ export default async function InvitePage({ params }: InvitePageProps) {
 
   if (!invite) {
     return (
-      <div className="min-h-screen bg-[#f7f4ef] px-6 py-20 text-[#1f1a17]">
-        <div className="mx-auto max-w-2xl rounded-[28px] border border-[#e2d6c4] bg-white/80 p-8 text-center shadow-[0_30px_80px_-55px_rgba(27,20,16,0.65)]">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#8c7a6b]">Invite status</p>
+      <div className="min-h-screen bg-slate-50 px-6 py-20 text-slate-900">
+        <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">
+            Invite status
+          </p>
           <h1 className="mt-3 text-2xl font-semibold">Invite not found</h1>
-          <p className="mt-3 text-sm text-[#6b5d52]">
+          <p className="mt-3 text-sm text-slate-500">
             This invite link is invalid or has already been used.
           </p>
         </div>
@@ -65,11 +69,13 @@ export default async function InvitePage({ params }: InvitePageProps) {
 
   if (isInactive) {
     return (
-      <div className="min-h-screen bg-[#f7f4ef] px-6 py-20 text-[#1f1a17]">
-        <div className="mx-auto max-w-2xl rounded-[28px] border border-[#e2d6c4] bg-white/80 p-8 text-center shadow-[0_30px_80px_-55px_rgba(27,20,16,0.65)]">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#8c7a6b]">Invite status</p>
+      <div className="min-h-screen bg-slate-50 px-6 py-20 text-slate-900">
+        <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">
+            Invite status
+          </p>
           <h1 className="mt-3 text-2xl font-semibold">Invite expired</h1>
-          <p className="mt-3 text-sm text-[#6b5d52]">
+          <p className="mt-3 text-sm text-slate-500">
             Ask your organization owner to resend your invite.
           </p>
         </div>
@@ -87,11 +93,13 @@ export default async function InvitePage({ params }: InvitePageProps) {
   const sessionEmail = session.user.email?.toLowerCase();
   if (!sessionEmail || sessionEmail !== invite.email.toLowerCase()) {
     return (
-      <div className="min-h-screen bg-[#f7f4ef] px-6 py-20 text-[#1f1a17]">
-        <div className="mx-auto max-w-2xl rounded-[28px] border border-[#e2d6c4] bg-white/80 p-8 text-center shadow-[0_30px_80px_-55px_rgba(27,20,16,0.65)]">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#8c7a6b]">Invite status</p>
+      <div className="min-h-screen bg-slate-50 px-6 py-20 text-slate-900">
+        <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">
+            Invite status
+          </p>
           <h1 className="mt-3 text-2xl font-semibold">Wrong account</h1>
-          <p className="mt-3 text-sm text-[#6b5d52]">
+          <p className="mt-3 text-sm text-slate-500">
             This invite was sent to {invite.email}. Sign in with that account to accept.
           </p>
         </div>
@@ -100,7 +108,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f4ef] px-6 py-20 text-[#1f1a17]">
+    <div className="min-h-screen bg-slate-50 px-6 py-20 text-slate-900">
       <div className="mx-auto max-w-2xl">
         <AcceptInviteClient
           token={token}

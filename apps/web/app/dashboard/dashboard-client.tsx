@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useApiKeys } from '@/hooks/use-api-keys';
 import { useMembers } from '@/hooks/use-members';
 import { useProjects } from '@/hooks/use-projects';
@@ -13,6 +12,7 @@ import { DashboardHeader } from './_components/dashboard-header';
 import { MemberSection } from './_components/member-section';
 import { OverviewTab } from './_components/overview-tab';
 import { ProjectSection } from './_components/project-section';
+import { SidebarNav } from './_components/sidebar-nav';
 
 export function DashboardClient({
   orgId,
@@ -25,7 +25,7 @@ export function DashboardClient({
   const projects = useProjects(orgId);
   const apiKeys = useApiKeys(orgId, projects.model.selectedProjectId);
   const members = useMembers(orgId, orgRole, userId);
-  const [activeTab, setActiveTab] = useState<'overview' | 'projects' | 'keys' | 'members'>(
+  const [activeSection, setActiveSection] = useState<'overview' | 'projects' | 'keys' | 'members'>(
     'overview',
   );
 
@@ -44,81 +44,75 @@ export function DashboardClient({
     ],
   );
 
+  const headerContent = useMemo(() => {
+    switch (activeSection) {
+      case 'projects':
+        return {
+          title: 'Projects',
+          subtitle: 'Organize products and manage their surface area.',
+        };
+      case 'keys':
+        return {
+          title: 'API Keys',
+          subtitle: 'Issue and manage secure access tokens.',
+        };
+      case 'members':
+        return {
+          title: 'Members & Invites',
+          subtitle: 'Keep ownership tight and invite collaborators.',
+        };
+      default:
+        return {
+          title: 'Overview',
+          subtitle: 'Operational clarity for your org and product surface.',
+        };
+    }
+  }, [activeSection]);
+
   return (
-    <div className="min-h-screen bg-[#f7f4ef] text-[#1f1a17]">
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(68%_90%_at_20%_10%,#efe4d2_0%,transparent_60%),radial-gradient(60%_60%_at_82%_12%,#e9d5b9_0%,transparent_55%),linear-gradient(120deg,#f7f4ef_0%,#f4efe7_60%,#efe7dc_100%)]" />
-        <div className="absolute inset-0 opacity-25 mix-blend-multiply [background-image:radial-gradient(#1f1a17_1px,transparent_1px)] [background-size:18px_18px]" />
-        <div className="relative px-6 py-16">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <div className="flex min-h-screen flex-col lg:flex-row">
+        <SidebarNav
+          orgId={orgId}
+          orgName={orgName}
+          orgSlug={orgSlug}
+          orgs={orgs}
+          activeSection={activeSection}
+          onSelectSection={setActiveSection}
+        />
+        <main className="flex-1 px-6 py-10 lg:px-10">
           <div className="mx-auto max-w-6xl">
             <DashboardHeader
-              orgId={orgId}
+              title={headerContent.title}
+              subtitle={headerContent.subtitle}
               orgName={orgName}
-              orgSlug={orgSlug}
-              orgs={orgs}
-              selectedProjectName={projects.selectedProject?.name}
-              selectedProjectSlug={projects.selectedProject?.slug}
             />
 
-            <Tabs
-              value={activeTab}
-              onValueChange={(value) => setActiveTab(value as typeof activeTab)}
-              className="mt-10"
-            >
-              <TabsList
-                variant="line"
-                className="flex w-full flex-wrap justify-start gap-4 border-b border-[#eadfcf] bg-transparent p-0"
-              >
-                <TabsTrigger
-                  value="overview"
-                  className="rounded-none border-b-2 border-transparent px-0 pb-3 text-xs uppercase tracking-[0.28em] text-[#9c8877] data-[state=active]:border-[#1f1a17] data-[state=active]:text-[#1f1a17]"
-                >
-                  Overview
-                </TabsTrigger>
-                <TabsTrigger
-                  value="projects"
-                  className="rounded-none border-b-2 border-transparent px-0 pb-3 text-xs uppercase tracking-[0.28em] text-[#9c8877] data-[state=active]:border-[#1f1a17] data-[state=active]:text-[#1f1a17]"
-                >
-                  Projects
-                </TabsTrigger>
-                <TabsTrigger
-                  value="keys"
-                  className="rounded-none border-b-2 border-transparent px-0 pb-3 text-xs uppercase tracking-[0.28em] text-[#9c8877] data-[state=active]:border-[#1f1a17] data-[state=active]:text-[#1f1a17]"
-                >
-                  API Keys
-                </TabsTrigger>
-                <TabsTrigger
-                  value="members"
-                  className="rounded-none border-b-2 border-transparent px-0 pb-3 text-xs uppercase tracking-[0.28em] text-[#9c8877] data-[state=active]:border-[#1f1a17] data-[state=active]:text-[#1f1a17]"
-                >
-                  Members & Invites
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview" className="pt-8">
+            <div className="mt-8">
+              {activeSection === 'overview' ? (
                 <OverviewTab
                   orgName={orgName}
                   selectedProjectName={projects.selectedProject?.name}
                   selectedProjectSlug={projects.selectedProject?.slug}
                   stats={overviewStats}
-                  onSelectTab={setActiveTab}
+                  onSelectSection={setActiveSection}
                 />
-              </TabsContent>
+              ) : null}
 
-              <TabsContent value="projects" className="pt-8">
+              {activeSection === 'projects' ? (
                 <ProjectSection model={projects.model} actions={projects.actions} />
-              </TabsContent>
+              ) : null}
 
-              <TabsContent value="keys" className="pt-8">
+              {activeSection === 'keys' ? (
                 <ApiKeySection model={apiKeys.model} actions={apiKeys.actions} />
-              </TabsContent>
+              ) : null}
 
-              <TabsContent value="members" className="pt-8">
+              {activeSection === 'members' ? (
                 <MemberSection model={members.model} actions={members.actions} />
-              </TabsContent>
-            </Tabs>
+              ) : null}
+            </div>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );

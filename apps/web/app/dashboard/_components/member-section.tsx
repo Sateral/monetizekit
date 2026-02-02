@@ -26,25 +26,29 @@ export function MemberSection({ model, actions }: MemberSectionProps) {
     actions;
 
   return (
-    <section className="rounded-[34px] border border-[#e0d2bf] bg-white/90 p-10 shadow-[0_30px_70px_-60px_rgba(27,20,16,0.7)]">
+    <section className="rounded-2xl border border-slate-200 bg-white p-10 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-6">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-[#8c7a6b]">Team ledger</p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight">Members and access control</h2>
-          <p className="mt-2 max-w-2xl text-sm text-[#5c524a]">
+          <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">
+            Team ledger
+          </p>
+          <h2 className="mt-3 text-2xl font-semibold text-slate-900">Members and access control</h2>
+          <p className="mt-2 max-w-2xl text-sm text-slate-500">
             Keep ownership tight and document who has access to your organization and projects.
           </p>
         </div>
-        <div className="rounded-full border border-[#e9dece] bg-white px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-[#9c8877]">
+        <div className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-slate-400">
           {members.length} members
         </div>
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1.05fr_1.6fr]">
-        <div className="rounded-[26px] border border-[#eadfcf] bg-[#fffaf2] p-6">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#9c8877]">Invite by email</p>
-          <h3 className="mt-3 text-lg font-semibold text-[#1f1a17]">Add an existing user</h3>
-          <p className="mt-2 text-sm text-[#6b5d52]">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">
+            Invite by email
+          </p>
+          <h3 className="mt-3 text-lg font-semibold text-slate-900">Add an existing user</h3>
+          <p className="mt-2 text-sm text-slate-500">
             Members need a MonetizeKit account before they can join.
           </p>
 
@@ -53,56 +57,58 @@ export function MemberSection({ model, actions }: MemberSectionProps) {
               value={email}
               onChange={(event) => onEmailChange(event.target.value)}
               placeholder="name@company.com"
-              className="rounded-2xl border border-[#e6d9c8] bg-white px-4 py-3 text-sm text-[#1f1a17] shadow-sm transition focus:border-[#1f1a17] focus:outline-none focus:ring-2 focus:ring-[#1f1a17]/10"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
               disabled={!isOwner}
             />
-            {errors.email ? <p className="text-xs text-[#b05b3b]">{errors.email}</p> : null}
+            {errors.email ? <p className="text-xs text-rose-600">{errors.email}</p> : null}
             {errors.form ? (
-              <div className="rounded-2xl border border-[#f0d5c3] bg-[#fdf3ea] px-4 py-3 text-xs text-[#b05b3b]">
+              <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs text-rose-600">
                 {errors.form}
               </div>
             ) : null}
             <Button
               type="submit"
               disabled={!isOwner || isInviting}
-              className="h-10 rounded-2xl bg-[#1f1a17] text-sm font-semibold text-[#f7f4ef] shadow-lg shadow-[#1f1a17]/25 transition hover:bg-[#2a231f] disabled:bg-[#cbbdaf]"
+              className="h-10 rounded-xl bg-emerald-600 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-500"
             >
               {isInviting ? 'Sending invite...' : 'Send invite'}
             </Button>
             {!isOwner ? (
-              <p className="text-xs text-[#9c8877]">Only owners can invite or remove members.</p>
+              <p className="text-xs text-slate-400">Only owners can invite or remove members.</p>
             ) : null}
           </form>
         </div>
 
         <div className="grid gap-6">
-          <div className="rounded-[26px] border border-[#eadfcf] bg-white p-6">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#9c8877]">Access roster</p>
-              <p className="text-[11px] uppercase tracking-[0.28em] text-[#b6a59a]">Role badges</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">
+                Access roster
+              </p>
+              <p className="text-[11px] uppercase tracking-[0.28em] text-slate-400">Role badges</p>
             </div>
 
             <div className="mt-4">
               {isLoading ? (
-                <p className="text-sm text-[#7a6b5f]">Loading members...</p>
+                <p className="text-sm text-slate-500">Loading members...</p>
               ) : members.length === 0 ? (
-                <div className="rounded-2xl border border-[#eadfcf] bg-white px-4 py-4 text-sm text-[#6b5d52]">
+                <div className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-sm text-slate-500">
                   No members found yet.
                 </div>
               ) : (
                 <Table className="text-sm">
-                  <TableHeader className="[&_tr]:border-[#eadfcf]">
+                  <TableHeader className="[&_tr]:border-slate-200">
                     <TableRow>
-                      <TableHead className="px-0 text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                      <TableHead className="px-0 text-xs uppercase tracking-[0.24em] text-slate-400">
                         Member
                       </TableHead>
-                      <TableHead className="text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                      <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400">
                         Email
                       </TableHead>
-                      <TableHead className="text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                      <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400">
                         Role
                       </TableHead>
-                      <TableHead className="text-right text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                      <TableHead className="text-right text-xs uppercase tracking-[0.24em] text-slate-400">
                         Actions
                       </TableHead>
                     </TableRow>
@@ -116,28 +122,28 @@ export function MemberSection({ model, actions }: MemberSectionProps) {
                       const canDemote = isOwner && isMemberOwner && !isSelf;
 
                       return (
-                        <TableRow key={member.id} className="border-[#eadfcf]">
-                          <TableCell className="px-0 py-3 font-semibold text-[#1f1a17]">
+                        <TableRow key={member.id} className="border-slate-200">
+                          <TableCell className="px-0 py-3 font-semibold text-slate-900">
                             <div className="flex items-center gap-2">
                               <span>{member.user.name || member.user.email}</span>
                               {isSelf ? (
                                 <Badge
                                   variant="outline"
-                                  className="border-[#d7dfe7] bg-[#edf3f8] text-[10px] uppercase tracking-[0.26em] text-[#536170]"
+                                  className="border-slate-200 bg-slate-50 text-[10px] uppercase tracking-[0.26em] text-slate-500"
                                 >
                                   You
                                 </Badge>
                               ) : null}
                             </div>
                           </TableCell>
-                          <TableCell className="py-3 text-[#7a6b5f]">{member.user.email}</TableCell>
+                          <TableCell className="py-3 text-slate-500">{member.user.email}</TableCell>
                           <TableCell className="py-3">
                             <Badge
                               variant="outline"
                               className={
                                 isMemberOwner
-                                  ? 'border-[#dbe5d8] bg-[#eef7ed] text-[10px] uppercase tracking-[0.24em] text-[#3e6c42]'
-                                  : 'border-[#e5dcd4] bg-[#f7f0e6] text-[10px] uppercase tracking-[0.24em] text-[#7a6b5f]'
+                                  ? 'border-emerald-200 bg-emerald-50 text-[10px] uppercase tracking-[0.24em] text-emerald-700'
+                                  : 'border-slate-200 bg-slate-50 text-[10px] uppercase tracking-[0.24em] text-slate-500'
                               }
                             >
                               {member.role}
@@ -151,7 +157,7 @@ export function MemberSection({ model, actions }: MemberSectionProps) {
                                   size="sm"
                                   variant="outline"
                                   onClick={() => onDemoteOwner(member.user.id, member.user.name)}
-                                  className="rounded-full border-[#e6d9c8] text-[10px] uppercase tracking-[0.24em] text-[#6b5d52]"
+                                  className="rounded-full border-slate-200 text-[10px] uppercase tracking-[0.24em] text-slate-600"
                                 >
                                   Make member
                                 </Button>
@@ -161,7 +167,7 @@ export function MemberSection({ model, actions }: MemberSectionProps) {
                                   type="button"
                                   size="sm"
                                   onClick={() => onTransferOwner(member.user.id, member.user.name)}
-                                  className="rounded-full bg-[#1f1a17] text-[10px] uppercase tracking-[0.24em] text-[#f7f4ef] hover:bg-[#2a231f]"
+                                  className="rounded-full bg-emerald-600 text-[10px] uppercase tracking-[0.24em] text-white hover:bg-emerald-700"
                                 >
                                   Transfer owner
                                 </Button>
@@ -172,7 +178,7 @@ export function MemberSection({ model, actions }: MemberSectionProps) {
                                   size="sm"
                                   variant="outline"
                                   onClick={() => onRemove(member.user.id, member.user.name)}
-                                  className="rounded-full border-[#f0d5c3] text-[10px] uppercase tracking-[0.24em] text-[#b05b3b]"
+                                  className="rounded-full border-rose-200 text-[10px] uppercase tracking-[0.24em] text-rose-600"
                                 >
                                   Remove
                                 </Button>
@@ -188,33 +194,35 @@ export function MemberSection({ model, actions }: MemberSectionProps) {
             </div>
           </div>
 
-          <div className="rounded-[26px] border border-[#eadfcf] bg-[#fffdf8] p-6">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#9c8877]">Pending invites</p>
-              <p className="text-[11px] uppercase tracking-[0.28em] text-[#b6a59a]">Expiry</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">
+                Pending invites
+              </p>
+              <p className="text-[11px] uppercase tracking-[0.28em] text-slate-400">Expiry</p>
             </div>
 
             <div className="mt-4">
               {isInvitesLoading ? (
-                <p className="text-sm text-[#7a6b5f]">Loading invites...</p>
+                <p className="text-sm text-slate-500">Loading invites...</p>
               ) : invites.length === 0 ? (
-                <div className="rounded-2xl border border-[#eadfcf] bg-white px-4 py-4 text-sm text-[#6b5d52]">
+                <div className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-sm text-slate-500">
                   No active invites.
                 </div>
               ) : (
                 <Table className="text-sm">
-                  <TableHeader className="[&_tr]:border-[#eadfcf]">
+                  <TableHeader className="[&_tr]:border-slate-200">
                     <TableRow>
-                      <TableHead className="px-0 text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                      <TableHead className="px-0 text-xs uppercase tracking-[0.24em] text-slate-400">
                         Email
                       </TableHead>
-                      <TableHead className="text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                      <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400">
                         Expires
                       </TableHead>
-                      <TableHead className="text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                      <TableHead className="text-xs uppercase tracking-[0.24em] text-slate-400">
                         Status
                       </TableHead>
-                      <TableHead className="text-right text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                      <TableHead className="text-right text-xs uppercase tracking-[0.24em] text-slate-400">
                         Actions
                       </TableHead>
                     </TableRow>
@@ -228,15 +236,15 @@ export function MemberSection({ model, actions }: MemberSectionProps) {
                       });
 
                       return (
-                        <TableRow key={invite.id} className="border-[#eadfcf]">
-                          <TableCell className="px-0 py-3 font-semibold text-[#1f1a17]">
+                        <TableRow key={invite.id} className="border-slate-200">
+                          <TableCell className="px-0 py-3 font-semibold text-slate-900">
                             {invite.email}
                           </TableCell>
-                          <TableCell className="py-3 text-[#7a6b5f]">{expiresLabel}</TableCell>
+                          <TableCell className="py-3 text-slate-500">{expiresLabel}</TableCell>
                           <TableCell className="py-3">
                             <Badge
                               variant="outline"
-                              className="border-[#e5dcd4] bg-[#f7f0e6] text-[10px] uppercase tracking-[0.24em] text-[#7a6b5f]"
+                              className="border-slate-200 bg-slate-50 text-[10px] uppercase tracking-[0.24em] text-slate-500"
                             >
                               Pending
                             </Badge>
@@ -247,7 +255,7 @@ export function MemberSection({ model, actions }: MemberSectionProps) {
                               size="sm"
                               variant="outline"
                               onClick={() => onRevokeInvite(invite.id, invite.email)}
-                              className="rounded-full border-[#f0d5c3] text-[10px] uppercase tracking-[0.24em] text-[#b05b3b]"
+                              className="rounded-full border-rose-200 text-[10px] uppercase tracking-[0.24em] text-rose-600"
                             >
                               Revoke
                             </Button>

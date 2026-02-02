@@ -10,5 +10,5 @@ export type OverviewTabProps = {
   selectedProjectName?: string | null;
   selectedProjectSlug?: string | null;
   stats: OverviewStats;
-  onSelectTab: (tab: 'projects' | 'keys' | 'members') => void;
+  onSelectSection: (section: 'projects' | 'keys' | 'members') => void;
 };

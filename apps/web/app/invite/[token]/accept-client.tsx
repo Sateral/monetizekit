@@ -26,14 +26,16 @@ export function AcceptInviteClient({
   });
 
   return (
-    <div className="rounded-[28px] border border-[#e2d6c4] bg-white/90 p-8 shadow-[0_30px_80px_-55px_rgba(27,20,16,0.65)]">
-      <p className="text-xs uppercase tracking-[0.3em] text-[#8c7a6b]">Organization invite</p>
-      <h1 className="mt-3 text-3xl font-semibold tracking-tight">Join {orgName}</h1>
-      <p className="mt-3 text-sm text-[#6b5d52]">
+    <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+      <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">
+        Organization invite
+      </p>
+      <h1 className="mt-3 text-3xl font-semibold text-slate-900">Join {orgName}</h1>
+      <p className="mt-3 text-sm text-slate-500">
         {inviterName ? `${inviterName} invited you` : 'You were invited'} at {email}.
       </p>
       {acceptInvite.error ? (
-        <div className="mt-4 rounded-2xl border border-[#f0d5c3] bg-[#fdf3ea] px-4 py-3 text-xs text-[#b05b3b]">
+        <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs text-rose-600">
           {acceptInvite.error.message}
         </div>
       ) : null}
@@ -42,7 +44,7 @@ export function AcceptInviteClient({
           type="button"
           onClick={() => acceptInvite.mutate({ token })}
           disabled={acceptInvite.isPending}
-          className="h-11 rounded-2xl bg-[#1f1a17] text-sm font-semibold text-[#f7f4ef] shadow-lg shadow-[#1f1a17]/25 transition hover:bg-[#2a231f]"
+          className="h-11 rounded-xl bg-emerald-600 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
         >
           {acceptInvite.isPending ? 'Accepting...' : 'Accept invite'}
         </Button>
@@ -50,12 +52,12 @@ export function AcceptInviteClient({
           type="button"
           variant="outline"
           onClick={() => router.push('/')}
-          className="h-11 rounded-2xl border-[#e6d9c8] text-sm text-[#6b5d52]"
+          className="h-11 rounded-xl border-slate-200 text-sm text-slate-600"
         >
           Return home
         </Button>
       </div>
-      <p className="mt-4 text-[11px] uppercase tracking-[0.28em] text-[#9c8877]">
+      <p className="mt-4 text-[11px] uppercase tracking-[0.28em] text-slate-400">
         You must be signed in with {email}.
       </p>
     </div>

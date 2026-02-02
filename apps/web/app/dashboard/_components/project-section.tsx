@@ -8,64 +8,66 @@ export function ProjectSection({ model, actions }: ProjectSectionProps) {
   const { onNameChange, onSlugChange, onSelectProject, onSubmit } = actions;
 
   return (
-    <section className="rounded-[30px] border border-[#e0d2bf] bg-white/85 p-8 shadow-[0_24px_60px_-55px_rgba(27,20,16,0.7)]">
+    <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-[#8c7a6b]">Projects</p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight">Organize your surface</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">
+            Projects
+          </p>
+          <h2 className="mt-3 text-2xl font-semibold text-slate-900">Organize your surface</h2>
         </div>
-        <div className="rounded-full border border-[#e9dece] bg-white px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-[#9c8877]">
+        <div className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-slate-400">
           {projects.length} total
         </div>
       </div>
 
       <form className="mt-6 grid gap-4" onSubmit={onSubmit}>
         <div className="grid gap-2">
-          <label className="text-xs font-semibold uppercase tracking-[0.26em] text-[#7a6b5f]">
+          <label className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-500">
             Project name
           </label>
           <input
             value={name}
             onChange={(event) => onNameChange(event.target.value)}
             placeholder="API Gateway"
-            className="rounded-2xl border border-[#e6d9c8] bg-white px-4 py-3 text-sm text-[#1f1a17] shadow-sm transition focus:border-[#1f1a17] focus:outline-none focus:ring-2 focus:ring-[#1f1a17]/10"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
-          {errors.name ? <p className="text-xs text-[#b05b3b]">{errors.name}</p> : null}
+          {errors.name ? <p className="text-xs text-rose-600">{errors.name}</p> : null}
         </div>
         <div className="grid gap-2">
-          <label className="text-xs font-semibold uppercase tracking-[0.26em] text-[#7a6b5f]">
+          <label className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-500">
             Project slug
           </label>
           <input
             value={slug}
             onChange={(event) => onSlugChange(event.target.value)}
             placeholder="api-gateway"
-            className="rounded-2xl border border-[#e6d9c8] bg-white px-4 py-3 text-sm text-[#1f1a17] shadow-sm transition focus:border-[#1f1a17] focus:outline-none focus:ring-2 focus:ring-[#1f1a17]/10"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
-          <p className="text-[11px] uppercase tracking-[0.28em] text-[#9c8877]">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-slate-400">
             Preview: {slugPreview || '---'}
           </p>
-          {errors.slug ? <p className="text-xs text-[#b05b3b]">{errors.slug}</p> : null}
+          {errors.slug ? <p className="text-xs text-rose-600">{errors.slug}</p> : null}
         </div>
         {errors.form ? (
-          <div className="rounded-2xl border border-[#f0d5c3] bg-[#fdf3ea] px-4 py-3 text-xs text-[#b05b3b]">
+          <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs text-rose-600">
             {errors.form}
           </div>
         ) : null}
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="h-11 rounded-2xl bg-[#1f1a17] text-sm font-semibold text-[#f7f4ef] shadow-lg shadow-[#1f1a17]/25 transition hover:bg-[#2a231f]"
+          className="h-11 rounded-xl bg-emerald-600 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
         >
           {isSubmitting ? 'Creating project...' : 'Create project'}
         </Button>
       </form>
 
-      <div className="mt-8 border-t border-dashed border-[#e7d9c6] pt-6">
+      <div className="mt-8 border-t border-dashed border-slate-200 pt-6">
         {isLoading ? (
-          <p className="text-sm text-[#7a6b5f]">Loading projects...</p>
+          <p className="text-sm text-slate-500">Loading projects...</p>
         ) : projects.length === 0 ? (
-          <div className="rounded-2xl border border-[#eadfcf] bg-white px-4 py-4 text-sm text-[#6b5d52]">
+          <div className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-sm text-slate-500">
             No projects yet. Create one to start issuing keys.
           </div>
         ) : (
@@ -75,17 +77,17 @@ export function ProjectSection({ model, actions }: ProjectSectionProps) {
                 key={project.id}
                 type="button"
                 onClick={() => onSelectProject(project.id)}
-                className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-left transition ${
+                className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left transition ${
                   selectedProjectId === project.id
-                    ? 'border-[#1f1a17] bg-[#1f1a17] text-[#f7f4ef] shadow-lg shadow-[#1f1a17]/20'
-                    : 'border-[#e6d9c8] bg-white text-[#1f1a17] hover:border-[#1f1a17]/40'
+                    ? 'border-emerald-600 bg-emerald-600 text-white shadow-sm'
+                    : 'border-slate-200 bg-white text-slate-900 hover:border-slate-300'
                 }`}
               >
                 <div>
                   <p className="text-sm font-semibold">{project.name}</p>
                   <p
                     className={`text-[11px] uppercase tracking-[0.28em] ${
-                      selectedProjectId === project.id ? 'text-[#e7d7c6]' : 'text-[#9c8877]'
+                      selectedProjectId === project.id ? 'text-white/70' : 'text-slate-400'
                     }`}
                   >
                     /{project.slug}
@@ -93,7 +95,7 @@ export function ProjectSection({ model, actions }: ProjectSectionProps) {
                 </div>
                 <span
                   className={`text-[11px] uppercase tracking-[0.28em] ${
-                    selectedProjectId === project.id ? 'text-[#e7d7c6]' : 'text-[#b6a59a]'
+                    selectedProjectId === project.id ? 'text-white/70' : 'text-slate-400'
                   }`}
                 >
                   Active
