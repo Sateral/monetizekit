@@ -8,9 +8,9 @@ import { DashboardClient } from './dashboard-client';
 import { EmptyDashboard } from './empty-dashboard';
 
 type DashboardPageProps = {
-  searchParams: {
+  searchParams: Promise<{
     orgId?: string;
-  };
+  }>;
 };
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
@@ -31,7 +31,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     return <EmptyDashboard />;
   }
 
-  const requestedOrgId = searchParams.orgId;
+  const { orgId: requestedOrgId } = await searchParams;
   const membership = requestedOrgId
     ? memberships.find((item) => item.orgId === requestedOrgId)
     : memberships[0];
