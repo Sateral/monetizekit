@@ -1,5 +1,13 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import type { MemberSectionProps } from '@/types/dashboard';
 
 export function MemberSection({ model, actions }: MemberSectionProps) {
@@ -18,7 +26,7 @@ export function MemberSection({ model, actions }: MemberSectionProps) {
     actions;
 
   return (
-    <section className="mt-8 rounded-[34px] border border-[#e0d2bf] bg-white/90 p-10 shadow-[0_30px_70px_-60px_rgba(27,20,16,0.7)]">
+    <section className="rounded-[34px] border border-[#e0d2bf] bg-white/90 p-10 shadow-[0_30px_70px_-60px_rgba(27,20,16,0.7)]">
       <div className="flex flex-wrap items-center justify-between gap-6">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-[#8c7a6b]">Team ledger</p>
@@ -32,7 +40,7 @@ export function MemberSection({ model, actions }: MemberSectionProps) {
         </div>
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_1.4fr]">
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1.05fr_1.6fr]">
         <div className="rounded-[26px] border border-[#eadfcf] bg-[#fffaf2] p-6">
           <p className="text-xs uppercase tracking-[0.3em] text-[#9c8877]">Invite by email</p>
           <h3 className="mt-3 text-lg font-semibold text-[#1f1a17]">Add an existing user</h3>
@@ -67,143 +75,190 @@ export function MemberSection({ model, actions }: MemberSectionProps) {
           </form>
         </div>
 
-        <div className="rounded-[26px] border border-[#eadfcf] bg-white p-6">
-          <div className="flex items-center justify-between">
-            <p className="text-xs uppercase tracking-[0.3em] text-[#9c8877]">Access roster</p>
-            <p className="text-[11px] uppercase tracking-[0.28em] text-[#b6a59a]">Role badges</p>
+        <div className="grid gap-6">
+          <div className="rounded-[26px] border border-[#eadfcf] bg-white p-6">
+            <div className="flex items-center justify-between">
+              <p className="text-xs uppercase tracking-[0.3em] text-[#9c8877]">Access roster</p>
+              <p className="text-[11px] uppercase tracking-[0.28em] text-[#b6a59a]">Role badges</p>
+            </div>
+
+            <div className="mt-4">
+              {isLoading ? (
+                <p className="text-sm text-[#7a6b5f]">Loading members...</p>
+              ) : members.length === 0 ? (
+                <div className="rounded-2xl border border-[#eadfcf] bg-white px-4 py-4 text-sm text-[#6b5d52]">
+                  No members found yet.
+                </div>
+              ) : (
+                <Table className="text-sm">
+                  <TableHeader className="[&_tr]:border-[#eadfcf]">
+                    <TableRow>
+                      <TableHead className="px-0 text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                        Member
+                      </TableHead>
+                      <TableHead className="text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                        Email
+                      </TableHead>
+                      <TableHead className="text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                        Role
+                      </TableHead>
+                      <TableHead className="text-right text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                        Actions
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {members.map((member) => {
+                      const isMemberOwner = member.role === 'OWNER';
+                      const isSelf = member.user.id === userId;
+                      const canRemove = isOwner && !isMemberOwner;
+                      const canTransfer = isOwner && !isMemberOwner;
+                      const canDemote = isOwner && isMemberOwner && !isSelf;
+
+                      return (
+                        <TableRow key={member.id} className="border-[#eadfcf]">
+                          <TableCell className="px-0 py-3 font-semibold text-[#1f1a17]">
+                            <div className="flex items-center gap-2">
+                              <span>{member.user.name || member.user.email}</span>
+                              {isSelf ? (
+                                <Badge
+                                  variant="outline"
+                                  className="border-[#d7dfe7] bg-[#edf3f8] text-[10px] uppercase tracking-[0.26em] text-[#536170]"
+                                >
+                                  You
+                                </Badge>
+                              ) : null}
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-3 text-[#7a6b5f]">{member.user.email}</TableCell>
+                          <TableCell className="py-3">
+                            <Badge
+                              variant="outline"
+                              className={
+                                isMemberOwner
+                                  ? 'border-[#dbe5d8] bg-[#eef7ed] text-[10px] uppercase tracking-[0.24em] text-[#3e6c42]'
+                                  : 'border-[#e5dcd4] bg-[#f7f0e6] text-[10px] uppercase tracking-[0.24em] text-[#7a6b5f]'
+                              }
+                            >
+                              {member.role}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="py-3 text-right">
+                            <div className="flex flex-wrap justify-end gap-2">
+                              {canDemote ? (
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => onDemoteOwner(member.user.id, member.user.name)}
+                                  className="rounded-full border-[#e6d9c8] text-[10px] uppercase tracking-[0.24em] text-[#6b5d52]"
+                                >
+                                  Make member
+                                </Button>
+                              ) : null}
+                              {canTransfer ? (
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  onClick={() => onTransferOwner(member.user.id, member.user.name)}
+                                  className="rounded-full bg-[#1f1a17] text-[10px] uppercase tracking-[0.24em] text-[#f7f4ef] hover:bg-[#2a231f]"
+                                >
+                                  Transfer owner
+                                </Button>
+                              ) : null}
+                              {canRemove ? (
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => onRemove(member.user.id, member.user.name)}
+                                  className="rounded-full border-[#f0d5c3] text-[10px] uppercase tracking-[0.24em] text-[#b05b3b]"
+                                >
+                                  Remove
+                                </Button>
+                              ) : null}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              )}
+            </div>
           </div>
 
-          <div className="mt-4 grid gap-3">
-            {isLoading ? (
-              <p className="text-sm text-[#7a6b5f]">Loading members...</p>
-            ) : members.length === 0 ? (
-              <div className="rounded-2xl border border-[#eadfcf] bg-white px-4 py-4 text-sm text-[#6b5d52]">
-                No members found yet.
-              </div>
-            ) : (
-              members.map((member) => {
-                const isMemberOwner = member.role === 'OWNER';
-                const isSelf = member.user.id === userId;
-                const canRemove = isOwner && !isMemberOwner;
-                const canTransfer = isOwner && !isMemberOwner;
-                const canDemote = isOwner && isMemberOwner && !isSelf;
+          <div className="rounded-[26px] border border-[#eadfcf] bg-[#fffdf8] p-6">
+            <div className="flex items-center justify-between">
+              <p className="text-xs uppercase tracking-[0.3em] text-[#9c8877]">Pending invites</p>
+              <p className="text-[11px] uppercase tracking-[0.28em] text-[#b6a59a]">Expiry</p>
+            </div>
 
-                return (
-                  <div
-                    key={member.id}
-                    className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#e6d9c8] bg-[#fffdf8] px-4 py-4"
-                  >
-                    <div>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <p className="text-sm font-semibold text-[#1f1a17]">
-                          {member.user.name || member.user.email}
-                        </p>
-                        {isSelf ? (
-                          <span className="rounded-full border border-[#d7dfe7] bg-[#edf3f8] px-2.5 py-1 text-[10px] uppercase tracking-[0.26em] text-[#536170]">
-                            You
-                          </span>
-                        ) : null}
-                      </div>
-                      <p className="text-xs text-[#9c8877]">{member.user.email}</p>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span
-                        className={`rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.24em] ${
-                          isMemberOwner
-                            ? 'border-[#dbe5d8] bg-[#eef7ed] text-[#3e6c42]'
-                            : 'border-[#e5dcd4] bg-[#f7f0e6] text-[#7a6b5f]'
-                        }`}
-                      >
-                        {member.role}
-                      </span>
-                      {canDemote ? (
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={() => onDemoteOwner(member.user.id, member.user.name)}
-                          className="rounded-full border-[#e6d9c8] text-[10px] uppercase tracking-[0.24em] text-[#6b5d52]"
-                        >
-                          Make member
-                        </Button>
-                      ) : null}
-                      {canTransfer ? (
-                        <Button
-                          type="button"
-                          size="sm"
-                          onClick={() => onTransferOwner(member.user.id, member.user.name)}
-                          className="rounded-full bg-[#1f1a17] text-[10px] uppercase tracking-[0.24em] text-[#f7f4ef] hover:bg-[#2a231f]"
-                        >
-                          Transfer owner
-                        </Button>
-                      ) : null}
-                      {canRemove ? (
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={() => onRemove(member.user.id, member.user.name)}
-                          className="rounded-full border-[#f0d5c3] text-[10px] uppercase tracking-[0.24em] text-[#b05b3b]"
-                        >
-                          Remove
-                        </Button>
-                      ) : null}
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
+            <div className="mt-4">
+              {isInvitesLoading ? (
+                <p className="text-sm text-[#7a6b5f]">Loading invites...</p>
+              ) : invites.length === 0 ? (
+                <div className="rounded-2xl border border-[#eadfcf] bg-white px-4 py-4 text-sm text-[#6b5d52]">
+                  No active invites.
+                </div>
+              ) : (
+                <Table className="text-sm">
+                  <TableHeader className="[&_tr]:border-[#eadfcf]">
+                    <TableRow>
+                      <TableHead className="px-0 text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                        Email
+                      </TableHead>
+                      <TableHead className="text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                        Expires
+                      </TableHead>
+                      <TableHead className="text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-right text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                        Actions
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {invites.map((invite) => {
+                      const expiresAt = new Date(invite.expiresAt);
+                      const expiresLabel = expiresAt.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      });
 
-        <div className="rounded-[26px] border border-[#eadfcf] bg-[#fffdf8] p-6">
-          <div className="flex items-center justify-between">
-            <p className="text-xs uppercase tracking-[0.3em] text-[#9c8877]">Pending invites</p>
-            <p className="text-[11px] uppercase tracking-[0.28em] text-[#b6a59a]">Expiry</p>
-          </div>
-
-          <div className="mt-4 grid gap-3">
-            {isInvitesLoading ? (
-              <p className="text-sm text-[#7a6b5f]">Loading invites...</p>
-            ) : invites.length === 0 ? (
-              <div className="rounded-2xl border border-[#eadfcf] bg-white px-4 py-4 text-sm text-[#6b5d52]">
-                No active invites.
-              </div>
-            ) : (
-              invites.map((invite) => {
-                const expiresAt = new Date(invite.expiresAt);
-                const expiresLabel = expiresAt.toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                });
-
-                return (
-                  <div
-                    key={invite.id}
-                    className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#e6d9c8] bg-white px-4 py-4"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-[#1f1a17]">{invite.email}</p>
-                      <p className="text-xs text-[#9c8877]">Expires {expiresLabel}</p>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full border border-[#e5dcd4] bg-[#f7f0e6] px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-[#7a6b5f]">
-                        Pending
-                      </span>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => onRevokeInvite(invite.id, invite.email)}
-                        className="rounded-full border-[#f0d5c3] text-[10px] uppercase tracking-[0.24em] text-[#b05b3b]"
-                      >
-                        Revoke
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })
-            )}
+                      return (
+                        <TableRow key={invite.id} className="border-[#eadfcf]">
+                          <TableCell className="px-0 py-3 font-semibold text-[#1f1a17]">
+                            {invite.email}
+                          </TableCell>
+                          <TableCell className="py-3 text-[#7a6b5f]">{expiresLabel}</TableCell>
+                          <TableCell className="py-3">
+                            <Badge
+                              variant="outline"
+                              className="border-[#e5dcd4] bg-[#f7f0e6] text-[10px] uppercase tracking-[0.24em] text-[#7a6b5f]"
+                            >
+                              Pending
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="py-3 text-right">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => onRevokeInvite(invite.id, invite.email)}
+                              className="rounded-full border-[#f0d5c3] text-[10px] uppercase tracking-[0.24em] text-[#b05b3b]"
+                            >
+                              Revoke
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              )}
+            </div>
           </div>
         </div>
       </div>

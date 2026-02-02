@@ -1,5 +1,13 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import type { ApiKeySectionProps } from '@/types/dashboard';
 
 export function ApiKeySection({ model, actions }: ApiKeySectionProps) {
@@ -86,40 +94,63 @@ export function ApiKeySection({ model, actions }: ApiKeySectionProps) {
             No keys issued yet. Create one for your integrations.
           </div>
         ) : (
-          <div className="grid gap-3">
-            {apiKeys.map((key) => (
-              <div
-                key={key.id}
-                className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#e6d9c8] bg-white px-4 py-3"
-              >
-                <div>
-                  <p className="text-sm font-semibold text-[#1f1a17]">{key.name}</p>
-                  <p className="text-xs text-[#9c8877]">•••• {key.keyLast4}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  {key.revokedAt ? (
-                    <span className="rounded-full border border-[#f2d2c4] bg-[#fdf0e7] px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-[#b05b3b]">
-                      Revoked
-                    </span>
-                  ) : (
-                    <span className="rounded-full border border-[#dbe5d8] bg-[#eef7ed] px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-[#3e6c42]">
-                      Active
-                    </span>
-                  )}
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    disabled={Boolean(key.revokedAt) || isRevoking}
-                    onClick={() => onRevoke(key.id)}
-                    className="rounded-full border-[#e6d9c8] text-xs uppercase tracking-[0.24em] text-[#6b5d52]"
-                  >
-                    {key.revokedAt ? 'Revoked' : 'Revoke'}
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Table className="text-sm">
+            <TableHeader className="[&_tr]:border-[#eadfcf]">
+              <TableRow>
+                <TableHead className="px-0 text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                  Label
+                </TableHead>
+                <TableHead className="text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                  Last 4
+                </TableHead>
+                <TableHead className="text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                  Status
+                </TableHead>
+                <TableHead className="text-right text-xs uppercase tracking-[0.24em] text-[#9c8877]">
+                  Actions
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {apiKeys.map((key) => (
+                <TableRow key={key.id} className="border-[#eadfcf]">
+                  <TableCell className="px-0 py-3 font-semibold text-[#1f1a17]">
+                    {key.name}
+                  </TableCell>
+                  <TableCell className="py-3 text-[#7a6b5f]">•••• {key.keyLast4}</TableCell>
+                  <TableCell className="py-3">
+                    {key.revokedAt ? (
+                      <Badge
+                        variant="outline"
+                        className="border-[#f2d2c4] bg-[#fdf0e7] text-[10px] uppercase tracking-[0.24em] text-[#b05b3b]"
+                      >
+                        Revoked
+                      </Badge>
+                    ) : (
+                      <Badge
+                        variant="outline"
+                        className="border-[#dbe5d8] bg-[#eef7ed] text-[10px] uppercase tracking-[0.24em] text-[#3e6c42]"
+                      >
+                        Active
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="py-3 text-right">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={Boolean(key.revokedAt) || isRevoking}
+                      onClick={() => onRevoke(key.id)}
+                      className="rounded-full border-[#e6d9c8] text-xs uppercase tracking-[0.24em] text-[#6b5d52]"
+                    >
+                      {key.revokedAt ? 'Revoked' : 'Revoke'}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
       </div>
     </section>

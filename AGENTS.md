@@ -166,5 +166,6 @@ REDIS_TLS=true
 
 - Add API key verification utilities for request auth.
 - Add usage metering.
+- Add Usage and Billing dashboard tabs with placeholder states.
 - Add project-level settings (rename, delete) with safeguards.
 - Add org member invites UI polish (resend/copy link).

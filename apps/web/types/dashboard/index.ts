@@ -22,3 +22,4 @@ export type {
   ProjectModel,
   ProjectSectionProps,
 } from './projects';
+export type { OverviewStats, OverviewTabProps } from './overview';
