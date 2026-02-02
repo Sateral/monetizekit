@@ -25,6 +25,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@monetizekit/config": "workspace:*",
+        "@monetizekit/db": "workspace:*",
         "@prisma/adapter-pg": "^7.3.0",
         "@prisma/client": "^7.3.0",
         "@tanstack/react-query": "^5.90.20",
@@ -77,6 +78,10 @@
     "packages/db": {
       "name": "@monetizekit/db",
       "version": "0.0.0",
+      "dependencies": {
+        "@prisma/adapter-pg": "^7.3.0",
+        "@prisma/client": "^7.3.0",
+      },
     },
     "packages/entitlements": {
       "name": "@monetizekit/entitlements",

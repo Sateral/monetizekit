@@ -74,7 +74,7 @@ REDIS_TLS=true
 
 ## Prisma Notes
 - Prisma client output is **custom**: `packages/db/generated/prisma`.
-- Import Prisma Client from `packages/db/generated/prisma/client` (not `@prisma/client`).
+- Use the shared DB package: `import { createPrismaClient } from '@monetizekit/db'`.
 - Schema: `packages/db/prisma/schema.prisma`.
 - Migrations: `packages/db/prisma/migrations/`.
 
